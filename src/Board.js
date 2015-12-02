@@ -91,7 +91,6 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-    //  console.log(this.attributes.n);
       var size = this.attributes.n;
       var telltale = false;
       for (var i = 0; i < size; i++) {
@@ -110,10 +109,8 @@
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
       var board = this.rows();
-      console.log(board);
       var occupiedSquares = 0;
       for (var i = 0; i < board.length; i++) {
-console.log(board[i][colIndex], "hasColConflictAt");
         if (board[i][colIndex]) {
           occupiedSquares++;
         }
