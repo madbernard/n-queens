@@ -21,7 +21,6 @@ window.findNRooksSolution = function(n) {
   //emptyBoard.rows is the array of arrays
   //emptyBoard.togglePiece(0,0) at top corner
 
-  console.log(emptyBoard.rows());
   // put rook at top corner
   // row and column 0 are forbidden
   // ---
@@ -59,6 +58,7 @@ window.countNRooksSolutions = function(n) {
 
   // n is # of rooks to place
   function recurse(rowIdx, n) {
+//    debugger;
     // base case
     if (n === 0) {
       solutionCount++;
@@ -75,6 +75,7 @@ window.countNRooksSolutions = function(n) {
         //this is a good spot
         // move on to next row
         recurse(rowIdx+1, n-1);
+        rookBoard.togglePiece(rowIdx, i);
       }
       else {
         // no good in i/column space
