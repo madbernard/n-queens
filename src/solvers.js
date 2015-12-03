@@ -36,7 +36,7 @@ window.findNRooksSolution = function(n) {
 
   var solution = emptyBoard.rows();
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+
   return solution;
 };
 
@@ -48,7 +48,7 @@ window.countNRooksSolutions = function(n) {
   function factorial(num){
     if(num === 0){return 1} else { return num * factorial(num -1)}
   }
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+
   return solutionCount;
 };
 
@@ -56,10 +56,40 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution;
+  var allSolutions = [];
+  var queenBoard = new Board({n:n});
+  var emptyBoard = new Board({n:n});
+  var empty = emptyBoard.rows();
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  function search(queensToPlace, rowIndex) {
+    // http://stackoverflow.com/questions/21003059/how-do-you-clone-an-array-of-objects-using-underscore
+    //base case queens all placed
+    if (queensToPlace === 0) {
+      solution = queenBoard.rows();
+      var b = _.map(solution, _.clone);
+      allSolutions.push(b);
+      return;
+    }
+    // columns is i
+    for (var i = 0; i < n; i++) {
+      queenBoard.togglePiece(rowIndex, i);
+      if (!queenBoard.hasAnyQueenConflictsOn(rowIndex, i)) {
+        // good spot
+        search(queensToPlace - 1, rowIndex + 1);
+        queenBoard.togglePiece(rowIndex, i);
+      }
+      else {
+        queenBoard.togglePiece(rowIndex, i);
+      }
+    }
+  }
+
+  search(n, 0);
+
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(allSolutions[0]));
+  console.log(allSolutions);
+  return allSolutions[0] || empty;
 };
 
 
@@ -99,6 +129,6 @@ window.countNQueensSolutions = function(n, rowIndex, queenBoard) {
 
 //  queenSearch(n, 0);
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+
   return solutionCount;
 };
