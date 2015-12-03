@@ -44,52 +44,10 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  // only need to do the top row, all answers that come from each space there
-  // because n rooks fill the board
-  // solutionCount is one number
-  var solutionCount = 0;
-  var rookBoard = new Board({n:n});
-  var rowArray = rookBoard.rows();
-
-  // solutionCount increments when there are n rooks on the board
-  // ie rooks = 0
-  // the recursive fn tracks rooks/n?
-  // passing info:  as a parameter, or return it
-
-  // n is # of rooks to place
-  function recurse(rowIdx, n) {
-//    debugger;
-    // base case
-    if (n === 0) {
-      solutionCount++;
-      return;
-    }
-
-    // recursive case
-    //rowArraylength is 2
-    for(var i = 0; i < rowArray.length; i++) {
-      //first row...  i is column addresses
-      //start with rook at 0, i and look for solutions
-      rookBoard.togglePiece(rowIdx,i);
-      if (!rookBoard.hasAnyRooksConflicts()){
-        //this is a good spot
-        // move on to next row
-        recurse(rowIdx+1, n-1);
-        rookBoard.togglePiece(rowIdx, i);
-      }
-      else {
-        // no good in i/column space
-        // try other spaces in that row not yet tested ie, new i
-        rookBoard.togglePiece(rowIdx,i);
-      }
-      //at some spot in top row of board, spot denoted by i, rook placed there
-      //----- call itself?
-      //look at next row down, place rook in spot that isn't conflicted
-      //
-    }
+  var solutionCount = factorial(n);
+  function factorial(num){
+    if(num === 0){return 1} else { return num * factorial(num -1)}
   }
-  recurse(0,n);
-
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -107,8 +65,34 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var queenBoard = new Board({n:n});
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  var solutionCount = 0;
+
+  function queenSearch(queensToPlace, rowIdx) {
+    // base case is when n is 0, all queens placed
+    if (queensToPlace === 0) {
+      solutionCount++;
+      return;
+    }
+
+    // recurse, i is column index
+    for (var i = 0; i < n; i++) {
+      queenBoard.togglePiece(rowIdx, i);
+      if (!queenBoard.hasAnyQueenConflictsOn(rowIdx, i)) {
+        //great place for queen for now
+        queenSearch(queensToPlace - 1, rowIdx + 1);
+        queenBoard.togglePiece(rowIdx, i);
+      }
+      else {
+        // queen would die here, move her
+        queenBoard.togglePiece(rowIdx, i);
+      }
+    }
+  }
+
+  queenSearch(n, 0);
+
+  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
