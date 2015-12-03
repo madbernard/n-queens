@@ -64,34 +64,40 @@ window.findNQueensSolution = function(n) {
 
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
-window.countNQueensSolutions = function(n) {
-  var queenBoard = new Board({n:n});
+window.countNQueensSolutions = function(n, rowIndex, queenBoard) {
+  if (rowIndex === undefined) {
+    rowIndex = 0;
+  }
 
+  if (queenBoard === undefined) {
+    queenBoard =  new Board({n:n});
+  }
+  var rowNumber = queenBoard.rows();
   var solutionCount = 0;
 
-  function queenSearch(queensToPlace, rowIdx) {
+//  function queenSearch(queensToPlace, rowIdx) {
     // base case is when n is 0, all queens placed
-    if (queensToPlace === 0) {
-      solutionCount++;
-      return;
+    if (n === 0) {
+      return 1;
+//      return;
     }
 
     // recurse, i is column index
-    for (var i = 0; i < n; i++) {
-      queenBoard.togglePiece(rowIdx, i);
-      if (!queenBoard.hasAnyQueenConflictsOn(rowIdx, i)) {
+    for (var i = 0; i < rowNumber.length; i++) {
+      queenBoard.togglePiece(rowIndex, i);
+      if (!queenBoard.hasAnyQueenConflictsOn(rowIndex, i)) {
         //great place for queen for now
-        queenSearch(queensToPlace - 1, rowIdx + 1);
-        queenBoard.togglePiece(rowIdx, i);
+        solutionCount += this.countNQueensSolutions(n - 1, rowIndex + 1, queenBoard);
+        queenBoard.togglePiece(rowIndex, i);
       }
       else {
         // queen would die here, move her
-        queenBoard.togglePiece(rowIdx, i);
+        queenBoard.togglePiece(rowIndex, i);
       }
     }
-  }
 
-  queenSearch(n, 0);
+
+//  queenSearch(n, 0);
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
