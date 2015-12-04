@@ -95,40 +95,92 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n, rowIndex, queenBoard) {
-  if (rowIndex === undefined) {
-    rowIndex = 0;
-  }
+//   if (rowIndex === undefined) {
+//     rowIndex = 0;
+//   }
 
-  if (queenBoard === undefined) {
-    queenBoard =  new Board({n:n});
-  }
-  var rowNumber = queenBoard.rows();
-  var solutionCount = 0;
+//   if (queenBoard === undefined) {
+//     queenBoard =  new Board({n:n});
+//   }
+//   var rowNumber = queenBoard.rows();
+//   var solutionCount = 0;
 
-//  function queenSearch(queensToPlace, rowIdx) {
-    // base case is when n is 0, all queens placed
-    if (n === 0) {
-      return 1;
-//      return;
-    }
+// //  function queenSearch(queensToPlace, rowIdx) {
+//     // base case is when n is 0, all queens placed
+//     if (n === 0) {
+//       return 1;
+// //      return;
+//     }
 
-    // recurse, i is column index
-    for (var i = 0; i < rowNumber.length; i++) {
-      queenBoard.togglePiece(rowIndex, i);
-      if (!queenBoard.hasAnyQueenConflictsOn(rowIndex, i)) {
-        //great place for queen for now
-        solutionCount += this.countNQueensSolutions(n - 1, rowIndex + 1, queenBoard);
-        queenBoard.togglePiece(rowIndex, i);
+//     // recurse, i is column index
+//     for (var i = 0; i < rowNumber.length; i++) {
+//       queenBoard.togglePiece(rowIndex, i);
+//       if (!queenBoard.hasAnyQueenConflictsOn(rowIndex, i)) {
+//         //great place for queen for now
+//         solutionCount += this.countNQueensSolutions(n - 1, rowIndex + 1, queenBoard);
+//         queenBoard.togglePiece(rowIndex, i);
+//       }
+//       else {
+//         // queen would die here, move her
+//         queenBoard.togglePiece(rowIndex, i);
+//       }
+//     }
+// n === 5
+//allOnes = 11111
+var allOnes = (1 << n) - 1;
+
+  var solutions = 0;
+
+  function nextRow(rightCon, leftCon, columnCon) {
+    if (columnCon === allOnes) {
+      solutions++;
+    } else {
+      /// ~(0)
+      ///(00001) & (11111)
+      //open === 00001
+      // right 00000 left 00000 col 00000 invert to 11111 & allones 000000000011111
+      // open is 11111
+
+      // 2nd time 00000 left 00010 col 00001 go to 00011 then 11100 then & 11100
+
+      // it recurses!!
+      var open = ~(rightCon | leftCon | columnCon) & allOnes;
+
+      while (open !== 0) {
+        // nextopen...  open is 11111 and -open is ??
+        // nextopen is 00001
+        // 2nd time nextopen 00100
+        var nextOpen = (open & -open);
+        // open is 11110
+        // 2nd open before reassignment 11100 ^ 00100
+        // 2nd time open becomes 11000
+        open = open ^ nextOpen;
+
+        var right = rightCon;
+        var left = leftCon;
+        var column = columnCon;
+
+        nextRow(
+            // 00000 | 00001 >> 00000 & goes to  00000
+            // 2nd time 00000 |
+            ((rightCon | nextOpen) >> 1) & allOnes,
+            // 00000 | 00001 << 00010 & goes to  00010
+            ((leftCon | nextOpen) << 1) & allOnes,
+            // 00000 | 00001 goes to 00001
+            columnCon | nextOpen);
       }
-      else {
-        // queen would die here, move her
-        queenBoard.togglePiece(rowIndex, i);
-      }
     }
+  }
+  nextRow(0, 0, 0);
 
+  return solutions;
 
-//  queenSearch(n, 0);
-
-
+// pos 0000||||||111 neg (where are the 0's, they indicate)
+// pos 8421/0||1/248 neg
+// negative 1 is 11111
+// negative 2 is 11110
+// negative 3 is 11101
+// negative 4 is 11100
+// negative 5 is 11011
   return solutionCount;
 };
